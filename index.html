@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+  <script src="https://unpkg.com/axios@0.18.0/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <script src="https://unpkg.com/vuejs-datepicker"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+
+  <style>
+    .panel-heading {
+      font-weight: bold;
+    }
+
+    .panel-body {
+      padding-left: 4vh;
+      padding-top: 4vh;
+    }
+
+    .picture img {
+      max-height: auto;
+      width: 52rem;
+      object-fit: scale-down;
+      border: 1px solid #c7c7c7;
+      border-radius: 8px;
+      -webkit-box-shadow: 0px 0px 15px 0px #aaa;
+      box-shadow: 0px 0px 15px 0px #aaa;
+    }
+
+    .circular {
+      height: 32rem;
+      width: auto;
+      background-size: cover;
+      border: 1px solid #c7c7c7;
+      border-radius: 8px;
+      -webkit-box-shadow: 0px 0px 15px 0px #aaa;
+      box-shadow: 0px 0px 15px 0px #aaa;
+    }
+
+    .desc {
+      padding-top: 1vh;
+      padding-bottom: 4vh;
+    }
+
+    .bg-dark {
+      background-color: #343a40;
+    }
+
+    #app {
+      margin-top: 90px;
+    }
+
+    a {
+      color: #6c757d !important;
+    }
+
+    .col-md-5 {
+      margin-bottom: 6vh
+    }
+
+    .float-right {
+      float: right;
+    }
+
+    .source {
+      background-color: cadetblue;
+      color: aliceblue;
+      display: inline-block;
+      border-radius: 5px;
+      padding: 10px 20px;
+    }
+
+    .nosource {
+      display: flex;
+      width: 180px;
+      margin: 0 auto;
+      padding: 10px 20px;
+    }
+
+    .loader{
+      display: flex;
+      width: 180px;
+      margin: 0 auto;
+      padding: 10px 20px;
+    }
+
+    .title {
+      display: flex;
+    }
+
+    .bord {
+      margin-bottom: 3rem;
+      padding: 1rem;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <script>
+    AOS.init();
+  </script>
+  <div id="app" class="container-fluid">
+
+    <!---NAV-->
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Top News</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item active">
+                <a class="nav-link" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+            </ul>
+
+            <input class="form-control" type="text" v-model="searchQuery" placeholder="Search" />
+              <!-- Date picker -->
+<!--   <vuejs-datepicker class="form-control" wrapper-class="inline" placeholder="From date" format="dd/MM/yyyy" :clear-button="true" v-model='publishedAt' @closed='checkDate();'></vuejs-datepicker>
+  <vuejs-datepicker class="form-control" wrapper-class="inline" placeholder="To date" format="dd/MM/yyyy" :clear-button="true" v-model='publishedAt' @closed='checkDate();' ></vuejs-datepicker> -->
+  <!-- Search Button -->
+  <!-- <input type='button' @click='fetchRecords()' value='Search'> -->
+
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!---NAV-->
+    <!--Main-->
+    <span></span>
+    <div class="loader" v-if="loading">Loading...</div>
+    <span v-else class="nosource" v-if="!resultQuery.length&&!loading">No items found</span>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <strong></strong></div>
+      <div class="row">
+        <div class="search-wrapper panel-heading col-sm-12">
+
+        </div>
+      </div>
+      <div class="bord v-card v-sheet theme--light elevation-2 aos-init aos-animate" v-for="item in resultQuery" v-if="resources.length">
+        <div class="col-md-7"  data-aos="zoom-in" data-aos-easing="ease">
+          <h2 class="featurette-heading">
+            <a :href="`${item.url}`" target="_blank">
+              <p class="source">{{item.source.name}}</p>
+            </a>
+            <span class="title">{{item.title}}  | Published: {{moment(item.publishedAt).format('MM/DD/YYYY [at] hh:mm a')}}</span></h2>
+          <p class="lead">{{item.description}} <span class="text-muted"><a :href="`${item.url}`" target="_blank">Read
+                more >></a></span></p>
+        </div>
+
+        <div class="col-md-7">
+          <div v-if="item.urlToImage" data-aos="zoom-in" data-aos-easing="ease" class="circular" :style="{ backgroundImage: 'url(' + item.urlToImage + ')' }"></div>
+        </div>
+        <span v-else class="nosource">No items found</span>
+
+      </div>
+    </div>
+
+    <nav v-if="!loading&&resultQuery.length" id="pagnav" aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item">
+          <a class="page-link" href="#" @click="page = 1" aria-label="First">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#" v-if="page != 1" @click="page--" aria-label="Previous">
+            <span aria-hidden="true">&lsaquo;</span>
+          </a>
+        </li>
+        <li class="page-item" v-for="pageNumber in pages.slice(page-1, page+4)"
+          :class="{'active': page === pageNumber}"><a class="page-link" href="#"
+            @click="page = pageNumber">{{pageNumber}}</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#" @click="page++" v-if="page < pages.length" aria-label="Next">
+            <span aria-hidden="true">&rsaquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="#" @click="page = pages.length" aria-label="Last">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+  <script>
+
+$(function() {
+  $('input[name="daterange"]').daterangepicker({
+    opens: 'left'
+  }, function(start, end, label) {
+    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+  });
+});
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          searchQuery: null,
+          //url: "top-headlines.json",
+          resources: [],
+          publishedAt: null, 
+          delay: 3,
+          loading: true,
+          page: 1,
+          perPage: 12,
+          pages: [],
+          //Input your api key for news.api comment out the json file call.
+          //Uncomment the news.api calls to use this directly to call the api.
+          api_key:'',
+        };
+      },
+      fetchRecords: function(){
+
+if(this.searchQuery !=''){
+  //axios.get('https://newsapi.org/v2/top-headlines?country=us&apiKey='+this.api_key, {
+    axios.get('top-headlines.json', {
+    params: {
+      fromdate: this.searchQuery,
+      todate: this.searchQuery
+    }
+  });
+}
+      },
+      methods: {
+        getNewsfeed() {
+          axios
+            //.get('https://newsapi.org/v2/top-headlines?country=us&apiKey='+this.api_key)
+            .get('top-headlines.json') 
+            .then(response => {
+              this.resources = response.data.articles
+              console.log(this.resources);
+              this.loading = true
+            })
+            .catch(error => {
+              console.log(error)
+              this.errored = true
+            })
+            .finally(() => this.loading = false)
+        },
+        setPages() {
+          var numberOfPages = Math.ceil(this.resources.length / this.perPage);
+          for (var index = 1; index <= numberOfPages; index++) {
+            this.pages.push(index);
+          }
+        },
+        paginate(resources) {
+          var page = this.page;
+          var perPage = this.perPage;
+          var from = (page * perPage) - perPage;
+          var to = (page * perPage);
+          return resources.slice(from, to);
+        }
+      },
+      created() {
+        this.getNewsfeed();
+      },
+      watch: {
+        resources() {
+          this.setPages();
+        }
+      },
+      computed: {
+        filteredItems: function () {
+          return this.$eval('items | filterBy searchQuery');
+        }
+      },
+      computed: {
+    resultQuery() {
+      if (this.searchQuery) {
+        return this.resources.filter((item) => {
+          return this.searchQuery
+            .toLowerCase()
+            .split(" ")
+            .every(
+              (v) =>
+              item.title.toLowerCase().includes(v) 
+              //item.source.name.toLowerCase().includes(v) +
+              //item.description.toLowerCase().includes(v)
+                // item.title.toLowerCase().includes(v) +
+                // item.source.name.toLowerCase().includes(v) +
+                // item.description.toLowerCase().includes(v)
+            );
+        });
+      } else {
+        return this.paginate(this.resources);
+      }
+    },
+  },
+
+
+    })
+  </script>
+</body>
+
+</html>
